@@ -16,22 +16,22 @@ class Translation
   /**
    * @var string  Dossiers de stockage des traductions
    */
-  private static $storages = array();
+  protected static $storages = array();
 
   /**
    * @var string  Code de la langue active (fr par défaut)
    */
-  private static $languageCode = 'fr';
+  protected static $languageCode = 'fr';
 
   /**
    * @var array   Traductions
    */
-  private static $translations = array();
+  protected static $translations = array();
 
   /**
    * @var array   Fichiers chargés
    */
-  private static $files = array();
+  protected static $files = array();
 
   /**
    * Définit un autre dossier pour stocker les traductions (provoque le rechargement des fichiers déjà chargés)
@@ -111,7 +111,7 @@ class Translation
    * @return boolean         TRUE si succès
    * @throws \Exception
    */
-  private static function loadFileInMemory($fileName)
+  protected static function loadFileInMemory($fileName)
   {
     if (!preg_match('/\.ini$/i', $fileName)) {
       $fileName .= '.ini';
