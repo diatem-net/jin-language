@@ -36,12 +36,14 @@ class Translation
   /**
    * Définit un autre dossier pour stocker les traductions (provoque le rechargement des fichiers déjà chargés)
    *
-   * @param  string $storage    Dossier de stockage
+   * @param  string  $storage    Dossier de stockage
+   * @param  integer $priority   (optional) Priorité (10 par défaut)
    */
-  public static function addStorage($storage)
+  public static function addStorage($storage, $priority = 10)
   {
-    self::$storages[] = realpath(rtrim($storage, '/'));
-    self::$storages = array_unique(self::$storages);
+    self::$storages[$priority][] = realpath(rtrim($storage, '/'));
+    self::$storages[$priority] = array_unique(self::$storages[$priority]);
+    ksort(self::$storages);
     self::$translations = array();
     foreach(self::$files as $file) {
       static::loadFileInMemory($file);
@@ -117,15 +119,14 @@ class Translation
       $fileName .= '.ini';
     }
     $found = 0;
-    foreach (self::$storages as $storage) {
-      $data = parse_ini_file(sprintf('%s/%s/%s', $storage, self::$languageCode, $fileName));
-      if ($data) {
-        self::$translations = array_merge(self::$translations, $data);
-        $found++;
+    foreach (self::$storages as $priority => $substorages) {
+      foreach ($substorages as $storage) {
+        $data = parse_ini_file(sprintf('%s/%s/%s', $storage, self::$languageCode, $fileName));
+        if ($data) {
+          self::$translations = array_merge(self::$translations, $data);
+          $found++;
+        }
       }
-    }
-    if ($found > 1) {
-      throw new \Exception('Le fichier de traduction '.$fileName.' a été trouvé à '.$found.' emplacements différents. Veillez à ne pas réutiliser deux fois le même nom.');
     }
     return $found != 0;
   }
